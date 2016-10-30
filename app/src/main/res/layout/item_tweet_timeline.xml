@@ -9,12 +9,13 @@
 
     <ImageView
         android:id="@+id/userAvatar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
         tools:background="@mipmap/ic_launcher"/>
 
     <TextView
@@ -39,13 +40,18 @@
         android:layout_above="@+id/tweetBody"
         android:layout_alignBottom="@+id/userName"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="5dp"
         android:layout_toEndOf="@+id/userName"
+        android:layout_toLeftOf="@+id/tweetTime"
         android:layout_toRightOf="@+id/userName"
+        android:layout_toStartOf="@+id/tweetTime"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
         android:gravity="bottom|left"
         android:maxLines="1"
         android:text="userAccount"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+        android:textColor="@color/colorPrimaryDark"
+        tools:text="\@acountnameacountname"/>
 
     <TextView
         android:id="@+id/tweetTime"
@@ -55,11 +61,13 @@
         android:layout_alignBottom="@+id/userName"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="5dp"
+        android:fontFamily="sans-serif-light"
         android:gravity="bottom|left"
         android:maxLines="1"
         android:text="tweetTime"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+        android:textColor="@color/colorPrimaryDark"/>
+
 
     <TextView
         android:id="@+id/tweetBody"

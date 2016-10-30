@@ -50,7 +50,7 @@ public class TweetsArrayAdapter extends RecyclerView.Adapter<TweetsArrayAdapter.
         holder.ivUserAvatar.setImageResource(android.R.color.transparent);
         Glide.with(mActivity)
                 .load(tweet.getUser().getProfileImageUrl())
-                .bitmapTransform(new RoundedCornersTransformation(mActivity, 30, 0))
+                .bitmapTransform(new RoundedCornersTransformation(mActivity, 20, 0))
                 .into(holder.ivUserAvatar);
     }
 

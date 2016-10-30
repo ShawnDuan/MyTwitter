@@ -1,4 +1,4 @@
-package com.shawn_duan.mytwitter;
+package com.shawn_duan.mytwitter.utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;

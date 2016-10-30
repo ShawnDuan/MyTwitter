@@ -1,6 +1,6 @@
 package com.shawn_duan.mytwitter.models;
 
-import com.shawn_duan.mytwitter.Utils;
+import com.shawn_duan.mytwitter.utils.DateUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +27,7 @@ public class Tweet {
             tweet.body = jsonObject.getString("text");
             tweet.uid = jsonObject.getLong("id");
             tweet.user = User.fromJSONObject(jsonObject.getJSONObject("user"));
-            tweet.createAt = Utils.getRelativeTimeAgo(jsonObject.getString("created_at"));
+            tweet.createAt = DateUtils.getRelativeTimeAgo(jsonObject.getString("created_at"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -29,8 +29,8 @@
         android:text="userName"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/userAccountName"
@@ -68,7 +68,9 @@
         android:layout_below="@+id/userName"
         android:layout_toEndOf="@+id/userAvatar"
         android:layout_toRightOf="@+id/userAvatar"
+        android:autoLink="all"
         android:fontFamily="sans-serif-light"
+        android:linksClickable="true"
         android:text="TextView"
         android:textColor="@color/black"
         android:textSize="15sp"/>

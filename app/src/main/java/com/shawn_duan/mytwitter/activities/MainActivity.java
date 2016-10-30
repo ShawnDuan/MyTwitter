@@ -1,4 +1,4 @@
-package com.shawn_duan.mytwitter;
+package com.shawn_duan.mytwitter.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.shawn_duan.mytwitter.R;
+import com.shawn_duan.mytwitter.fragments.TimeLineFragment;
+
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -23,7 +26,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.black));
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.twitter);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

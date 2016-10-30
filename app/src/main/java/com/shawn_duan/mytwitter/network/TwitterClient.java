@@ -1,4 +1,4 @@
-package com.shawn_duan.mytwitter;
+package com.shawn_duan.mytwitter.network;
 
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.FlickrApi;
@@ -33,12 +33,12 @@ public class TwitterClient extends OAuthBaseClient {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
 
-	public void getHomeTimeLine(AsyncHttpResponseHandler handler) {
+	public void getHomeTimeLine(long sinceId, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		// Specify the params
 		RequestParams params = new RequestParams();
 		params.put("count", 25);
-		params.put("since_id", 1);
+		params.put("since_id", (sinceId > 0) ? sinceId : 1);
 		// Execute the request
 		getClient().get(apiUrl, params, handler);
 	}

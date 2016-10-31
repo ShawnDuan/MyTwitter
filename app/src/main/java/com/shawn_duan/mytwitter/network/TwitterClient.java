@@ -25,26 +25,40 @@ import com.loopj.android.http.RequestParams;
 public class TwitterClient extends OAuthBaseClient {
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class;
 	public static final String REST_URL = "https://api.twitter.com/1.1/";
-	public static final String REST_CONSUMER_KEY = "NUV4nXH7dQYxaF09P2zjhvvO4";
-	public static final String REST_CONSUMER_SECRET = "RtKOiKNqdp8Vn5luKYqCrYmCr8dYWXFw7zW4Kz30XPMxKzw3qh"; // Change this
+	public static final String REST_CONSUMER_KEY = "ol2xErDjBT05EBvC0hIo1t1GT";
+	public static final String REST_CONSUMER_SECRET = "xJj56MtUQFbfQ0XbT4FT8dDJ4hExocJ3hi1NkwM84MO8NQkHYV"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://wxtwitter"; // Change this (here and in manifest)
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
 	}
 
-	public void getHomeTimeLine(long sinceId, AsyncHttpResponseHandler handler) {
+	public void getHomeTimeLine(long sinceId, long maxId, int count, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		// Specify the params
 		RequestParams params = new RequestParams();
-		params.put("count", 25);
-		params.put("since_id", (sinceId > 0) ? sinceId : 1);
+
+		if (sinceId > 0) {
+			params.put("since_id", sinceId);
+		}
+		if (maxId > 0) {
+			params.put("max_id", maxId);
+		}
+		// unlimited if count = -1
+		if (count > 0) {
+			params.put("count", count);
+		}
 		// Execute the request
 		getClient().get(apiUrl, params, handler);
 	}
 
-	public void composeTweet(AsyncHttpResponseHandler handler) {
-
+	public void composeTweet(String status, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/update.json");
+		// Specify the params
+		RequestParams params = new RequestParams();
+		params.put("status", status);
+		// Execute the request
+		getClient().post(apiUrl, params, handler);
 	}
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint

@@ -14,31 +14,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.shawn_duan.mytwitter.R;
+import com.shawn_duan.mytwitter.fragments.ComposeTweetDialogFragment;
 import com.shawn_duan.mytwitter.fragments.TimeLineFragment;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
 
     private FragmentManager mFragmentManager = getSupportFragmentManager();
+    private FloatingActionButton mFab;
+    public Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.black));
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitleTextColor(getResources().getColor(R.color.black));
+        setSupportActionBar(mToolbar);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.drawable.twitter);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                pushFragment(new ComposeTweetDialogFragment(), true);
             }
         });
 
@@ -78,6 +80,18 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
         if (mFragmentManager.getFragments() != null) {
             Log.d(TAG, "fragment # : " + mFragmentManager.getFragments().size());
+        }
+    }
+
+    public void hideFab() {
+        if (mFab != null) {
+            mFab.setVisibility(View.GONE);
+        }
+    }
+
+    public void showFab() {
+        if (mFab != null) {
+            mFab.setVisibility(View.VISIBLE);
         }
     }
 }

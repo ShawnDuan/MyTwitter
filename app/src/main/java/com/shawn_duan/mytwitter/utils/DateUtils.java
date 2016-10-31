@@ -1,5 +1,7 @@
 package com.shawn_duan.mytwitter.utils;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -9,6 +11,7 @@ import java.util.Locale;
  */
 
 public class DateUtils {
+    private final static String TAG = DateUtils.class.getSimpleName();
 
     public static String getRelativeTimeAgo(String rawJsonDate) {
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
@@ -24,7 +27,15 @@ public class DateUtils {
             e.printStackTrace();
         }
 
+        Log.d(TAG, relativeDate);
+        if (relativeDate.equals("Yesterday")) {
+            return "1d";
+        }
         String[] strings = relativeDate.split(" ");
-        return strings[0] + strings[1].charAt(0);
+        if (strings.length > 1) {
+            return strings[0] + strings[1].charAt(0);
+        } else {
+            return relativeDate;
+        }
     }
 }

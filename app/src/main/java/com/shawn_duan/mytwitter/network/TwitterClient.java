@@ -42,7 +42,7 @@ public class TwitterClient extends OAuthBaseClient {
 			params.put("since_id", sinceId);
 		}
 		if (maxId > 0) {
-			params.put("max_id", maxId);
+			params.put("max_id", maxId - 1);
 		}
 		// unlimited if count = -1
 		if (count > 0) {

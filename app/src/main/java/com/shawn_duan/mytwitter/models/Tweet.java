@@ -5,6 +5,7 @@ import com.shawn_duan.mytwitter.utils.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,14 @@ import java.util.List;
 
 public class Tweet {
 
-    private String body;
-    private long uid;
-    private User user;
-    private String createAt;
+    String body;
+    long uid;
+    User user;
+    String createAt;
+
+    public Tweet() {
+
+    }
 
     public static Tweet fromJSONObject(JSONObject jsonObject) {
         Tweet tweet = new Tweet();

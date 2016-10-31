@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -20,6 +19,8 @@ import com.shawn_duan.mytwitter.R;
 import com.shawn_duan.mytwitter.adapters.TweetsArrayAdapter;
 import com.shawn_duan.mytwitter.models.Tweet;
 import com.shawn_duan.mytwitter.network.TwitterClient;
+import com.shawn_duan.mytwitter.rxbus.InsertNewTweetEvent;
+import com.shawn_duan.mytwitter.rxbus.RxBus;
 import com.shawn_duan.mytwitter.utils.DividerItemDecoration;
 import com.shawn_duan.mytwitter.utils.EndlessRecyclerViewScrollListener;
 
@@ -32,6 +33,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by sduan on 10/29/16.
@@ -50,6 +53,7 @@ public class TimeLineFragment extends Fragment {
     private TweetsArrayAdapter mAdapter;
     private long mNewestId, mOldestId;
     private Unbinder unbinder;
+    private Subscription mNewTweetSubscription;
 
     private final static int NORMAL_POPULATE_AMOUNT = 25;
     private final static long NOT_APPLICABLE = 0;
@@ -59,18 +63,38 @@ public class TimeLineFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mClient = MyTwitterApplication.getRestClient();     // singleton client
         mTweetList = new ArrayList<>();
+
+        mNewTweetSubscription = RxBus.getInstance().toObserverable(InsertNewTweetEvent.class)
+                .subscribe(new Action1<InsertNewTweetEvent>() {
+                    @Override
+                    public void call(InsertNewTweetEvent insertNewTweetEvent) {
+                        try {
+                            Tweet tweet = insertNewTweetEvent.getTweet();
+                            mTweetList.add(0, tweet);
+                            mNewestId = tweet.getUid();
+                            mAdapter.notifyItemInserted(0);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                });
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
 
         View view = inflater.inflate(R.layout.fragment_timeline, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         setupRecyclerView();
 
-        populateTimeline(mNewestId, NOT_APPLICABLE, (int) NOT_APPLICABLE);
+        // only do auto-refresh at the first time.
+        if (mTweetList.size() == 0) {
+            populateTimeline(mNewestId, NOT_APPLICABLE, (int) NOT_APPLICABLE);
+        }
 
         return view;
     }
@@ -93,6 +117,14 @@ public class TimeLineFragment extends Fragment {
         unbinder.unbind();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mNewTweetSubscription != null && !mNewTweetSubscription.isUnsubscribed()) {
+            mNewTweetSubscription.unsubscribe();
+        }
+    }
+
     // if count is -1 or 0, populate as much as possible in the range of sinceId to maxId.
     private void populateTimeline(long sinceId, final long maxId, int count) {
 
@@ -105,18 +137,19 @@ public class TimeLineFragment extends Fragment {
                 // Load the model
                 boolean addToBottom = (maxId != NOT_APPLICABLE);
                 int newTweetCount = response.length();
+                int originalSize = mTweetList.size();
 
                 if (addToBottom) {
                     mTweetList.addAll(Tweet.fromJSONArray(response));
+                    mAdapter.notifyItemRangeInserted(originalSize + 1, newTweetCount);
                 } else {
                     mTweetList.addAll(0, Tweet.fromJSONArray(response));
+                    mAdapter.notifyItemRangeInserted(0, newTweetCount);
                 }
 
                 // update max/since id based on the current TweetList
                 mNewestId = mTweetList.get(0).getUid();
                 mOldestId = mTweetList.get(mTweetList.size() - 1).getUid();
-
-                mAdapter.notifyDataSetChanged();
 
                 if (!addToBottom) {
                     mRecyclerView.smoothScrollToPosition(0);
@@ -136,6 +169,9 @@ public class TimeLineFragment extends Fragment {
                     Toast.makeText(getActivity(),
                             "Request number meets the limit, please wait for 15mins before retry.",
                             Toast.LENGTH_SHORT).show();
+                }
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
             }
         });

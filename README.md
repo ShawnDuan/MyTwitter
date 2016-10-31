@@ -48,6 +48,7 @@ The following **additional** features are implemented:
 
 * [ ] Include replies?
 * [ ] Fetch user's info/profile, and show it somewhere.
+* [ ] Rxjava as event bus, to de-couple cross fragment communication.
 
 ## Video Walkthrough
 

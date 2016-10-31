@@ -23,8 +23,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.shawn_duan.mytwitter.MyTwitterApplication;
 import com.shawn_duan.mytwitter.R;
 import com.shawn_duan.mytwitter.activities.MainActivity;
+import com.shawn_duan.mytwitter.models.Tweet;
 import com.shawn_duan.mytwitter.network.TwitterClient;
-import com.shawn_duan.mytwitter.rxbus.RefreshTimelineEvent;
+import com.shawn_duan.mytwitter.rxbus.InsertNewTweetEvent;
 import com.shawn_duan.mytwitter.rxbus.RxBus;
 import com.shawn_duan.mytwitter.utils.Utils;
 
@@ -86,10 +87,13 @@ public class ComposeTweetDialogFragment extends DialogFragment {
             mClient.composeTweet(content, new JsonHttpResponseHandler(){
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Tweet newTweet = Tweet.fromJSONObject(response);
                     draft = "";
+
                     mActivity.onBackPressed();
                     Snackbar.make(mActivity.mToolbar, "Tweet submitted successfully!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+                    RxBus.getInstance().post(new InsertNewTweetEvent(newTweet));
                 }
 
                 @Override

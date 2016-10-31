@@ -2,6 +2,7 @@ package com.shawn_duan.mytwitter.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -54,11 +55,17 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     TextView tvRemainingCounter;
     private Unbinder unbinder;
 
+    private SharedPreferences mSharedPreferences;
+    private String draft;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mClient = MyTwitterApplication.getRestClient();     // singleton client
         mActivity = (MainActivity) getActivity();
+
+        mSharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        draft = mSharedPreferences.getString(getString(R.string.compose_draft), "");
     }
 
     @Nullable
@@ -66,7 +73,8 @@ public class ComposeTweetDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_compose, container, false);
         unbinder = ButterKnife.bind(this, view);
-        etComposeBody.requestFocus();
+        etComposeBody.append(draft);
+
         return view;
     }
 
@@ -78,6 +86,7 @@ public class ComposeTweetDialogFragment extends DialogFragment {
             mClient.composeTweet(content, new JsonHttpResponseHandler(){
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    draft = "";
                     mActivity.onBackPressed();
                     Snackbar.make(mActivity.mToolbar, "Tweet submitted successfully!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -94,9 +103,9 @@ public class ComposeTweetDialogFragment extends DialogFragment {
 
     @OnTextChanged(R.id.etComposeBody)
     void updateRemainingCount(Editable editable) {
-        String string = editable.toString();
-        int remaining = 140 - string.length();
-        tvRemainingCounter.setText(String.valueOf(140 - string.length()));
+        draft = editable.toString();
+        int remaining = 140 - draft.length();
+        tvRemainingCounter.setText(String.valueOf(140 - draft.length()));
         if (remaining < 0) {
             tvRemainingCounter.setTextColor(getResources().getColor(R.color.red));
             btSubmit.setClickable(false);
@@ -115,6 +124,10 @@ public class ComposeTweetDialogFragment extends DialogFragment {
 
     @Override
     public void onPause() {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(getString(R.string.compose_draft), draft);
+        editor.commit();
+
         ((MainActivity)getActivity()).showFab();
         Utils.hideSoftKeyboard(getActivity(), etComposeBody);
         super.onPause();

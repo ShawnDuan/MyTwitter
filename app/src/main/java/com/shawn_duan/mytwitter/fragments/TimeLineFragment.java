@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +28,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
 
 /**
@@ -37,10 +41,15 @@ public class TimeLineFragment extends Fragment {
     private final static String TAG = TimeLineFragment.class.getSimpleName();
 
     private TwitterClient mClient;
-    private RecyclerView mTimelineList;
+
+    @BindView(R.id.swipContainer)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.rcTimeLine)
+    RecyclerView mRecyclerView;
     private ArrayList<Tweet> mTweetList;
     private TweetsArrayAdapter mAdapter;
     private long mNewestId, mOldestId;
+    private Unbinder unbinder;
 
     private final static int NORMAL_POPULATE_AMOUNT = 25;
     private final static long NOT_APPLICABLE = 0;
@@ -57,7 +66,7 @@ public class TimeLineFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_timeline, container, false);
-        mTimelineList = (RecyclerView) view.findViewById(R.id.rcTimeLine);
+        unbinder = ButterKnife.bind(this, view);
 
         setupRecyclerView();
 
@@ -70,16 +79,18 @@ public class TimeLineFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume()");
-//        InputMethodManager imm = (InputMethodManager)
-//                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // if count is -1 or 0, populate as much as possible in the range of sinceId to maxId.
@@ -108,10 +119,14 @@ public class TimeLineFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
 
                 if (!addToBottom) {
-                    mTimelineList.smoothScrollToPosition(0);
+                    mRecyclerView.smoothScrollToPosition(0);
                 }
 
                 Log.d(TAG, "Amount of new tweets added into timeline: " + newTweetCount);
+
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
 
             @Override
@@ -131,15 +146,26 @@ public class TimeLineFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                populateTimeline(mNewestId, NOT_APPLICABLE, (int) NOT_APPLICABLE);
+            }
+        });
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        mTimelineList.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
         mAdapter = new TweetsArrayAdapter(getActivity(), mTweetList);
-        mTimelineList.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST);
-        mTimelineList.addItemDecoration(itemDecoration);
+        mRecyclerView.addItemDecoration(itemDecoration);
 
-        mTimelineList.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore()");

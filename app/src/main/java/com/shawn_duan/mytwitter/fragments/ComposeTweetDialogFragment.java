@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import org.json.JSONObject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
 
@@ -79,7 +81,6 @@ public class ComposeTweetDialogFragment extends DialogFragment {
                     mActivity.onBackPressed();
                     Snackbar.make(mActivity.mToolbar, "Tweet submitted successfully!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-
                 }
 
                 @Override
@@ -88,6 +89,20 @@ public class ComposeTweetDialogFragment extends DialogFragment {
                 }
             });
 
+        }
+    }
+
+    @OnTextChanged(R.id.etComposeBody)
+    void updateRemainingCount(Editable editable) {
+        String string = editable.toString();
+        int remaining = 140 - string.length();
+        tvRemainingCounter.setText(String.valueOf(140 - string.length()));
+        if (remaining < 0) {
+            tvRemainingCounter.setTextColor(getResources().getColor(R.color.red));
+            btSubmit.setClickable(false);
+        } else {
+            tvRemainingCounter.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+            btSubmit.setClickable(true);
         }
     }
 

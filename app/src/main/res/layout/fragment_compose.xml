@@ -87,7 +87,7 @@
             android:layout_marginRight="12dp"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/colorPrimaryDark"
-            tools:text="140"/>
+            android:text="140"/>
 
         <View
             android:layout_width="0dp"

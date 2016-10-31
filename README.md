@@ -33,7 +33,7 @@ The following **bonus** features are implemented:
 
 * [ ] User can see embedded image media within the tweet detail view
 * [ ] User can watch embedded video within the tweet
-* [ ] Compose tweet functionality is build using modal overlay
+* [X] Compose tweet functionality is build using modal overlay
 * [ ] Use Parcelable instead of Serializable using the popular [Parceler library](http://guides.codepath.com/android/Using-Parceler).
 * [X] [Leverage RecyclerView](http://guides.codepath.com/android/Using-the-RecyclerView) as a replacement for the ListView and ArrayAdapter for all lists of tweets.
 * [X] Move the "Compose" action to a [FloatingActionButton](https://github.com/codepath/android_guides/wiki/Floating-Action-Buttons) instead of on the AppBar.
